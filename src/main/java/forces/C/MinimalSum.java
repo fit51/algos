@@ -8,31 +8,52 @@ import java.util.*;
  */
 public class MinimalSum {
     public static void main(String[] args) {
-        Map m = new HashMap<Character, Integer>();
-        HashSet posChars = new HashSet<Character>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'));
-        Map mm = new HashMap<Integer, HashSet<Character>>();
-
-
-        Map<Integer, Map<Character, Integer>> posToChar = new HashMap<Integer, Map<Character, Integer>>();
-        for(int i = 1; i <= 6; i++) {
-            posToChar.put(i, new ArrayList<Character>());
+        Map<Character, Integer> m = new HashMap<Character, Integer>();
+        HashSet<Character> canBeZero = new HashSet(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'));
+        HashSet<Character> posChars = new HashSet(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'));
+        for(Character c:  posChars) {
+            m.put(c, 0);
         }
+
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
         String[] arr = new String[n];
         for(int i = 0; i<n; i++) {
-            char[] ar = sc.nextLine().toCharArray();
-            for(int j = 0; j< ar.length; j++) {
-                 posToChar.get(ar.length - j).add(ar[j]);
+            arr[i] = sc.next();
+        }
+        for(int i = 0; i<n; i++) {
+            char[] st = arr[i].toCharArray();
+            canBeZero.remove(st[0]);
+            for(int j = 0; j < st.length; j++) {
+                Integer val = m.getOrDefault(st[j], 0);
+                int pos = st.length - j - 1;
+                m.put(st[j], val + (int) Math.pow(10, pos));
             }
         }
-        int min = 0;
-        for(int i = 6; i >= 1; i--) {
-            Map<Character, Integer> count = new HashMap<Character, Integer>();
-            for(Character c: posToChar.get(i)) {
-                count.put(c, count.getOrDefault(c, 0) + 1);
+        List<Map.Entry<Character, Integer>> entries = new ArrayList(m.entrySet());
+        Collections.sort(entries, new Comparator<Map.Entry<Character, Integer>>() {
+            @Override
+            public int compare(Map.Entry<Character, Integer> o1, Map.Entry<Character, Integer> o2) {
+                return -1 * o1.getValue().compareTo(o2.getValue());
             }
-        }
+        });
 
+        long minSum = 0;
+        int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        int pos = 0;
+        boolean zeroUsed = false;
+        for(Map.Entry<Character, Integer> entry: entries) {
+            if(canBeZero.contains(entry.getKey()) && !zeroUsed) {
+                zeroUsed = true;
+            }
+            else {
+                int v = entry.getValue();
+                if (v > 0) {
+                    minSum += numbers[pos] * v;
+                    pos++;
+                }
+            }
+        }
+        System.out.println(minSum);
     }
 }
